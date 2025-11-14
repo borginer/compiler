@@ -1,13 +1,14 @@
 #include "utils.hpp"
+#include <cstddef>
 #include <vector>
 
 using namespace std;
 
 vector<string> splitString(string input) {
   vector<string> tokens;
-  int i = 0;
-  int prev = 0;
-  while (i < input.length()) {
+  size_t i = 0;
+  size_t prev = 0;
+  while (i < input.size()) {
     if (input[i] == ' ') {
       tokens.push_back(input.substr(prev, i - prev));
       while (input[i] == ' ') {
@@ -15,10 +16,10 @@ vector<string> splitString(string input) {
       }
       prev = i;
     } else {
-        i++;
+      i++;
     }
   }
-  
+
   if (i > prev) {
     tokens.push_back(input.substr(prev, i - prev));
   }
