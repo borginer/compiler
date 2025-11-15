@@ -5,15 +5,15 @@
 #include <vector>
 
 #include "common/token.hpp"
-
+namespace lexer {
 class Lexer {
     size_t index = 0;
     size_t start = 0;
     size_t line = 15;
     std::string input;
-    std::vector<Token> tokens;
+    std::vector<token::Token> tokens;
 
-    void addToken(TokenType tt, std::string val = "");
+    void addToken(token::Type tt, std::string val = "");
     bool isAtEnd();
     char step();
     char peek();
@@ -23,6 +23,7 @@ class Lexer {
 
    public:
     Lexer(std::string input);
-    std::vector<Token> Lex();
+    std::vector<token::Token> Lex();
     void PrintTokens();
 };
+}  // namespace lexer

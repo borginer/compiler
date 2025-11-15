@@ -8,6 +8,7 @@
 #include <vector>
 
 using namespace std;
+using namespace lexer;
 
 bool isDigit(char c) { return c >= '0' && c <= '9'; }
 
@@ -15,13 +16,13 @@ bool isAlpha(char c) {
     return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || c == '_';
 }
 
-unordered_map<string, TokenType> KEYWORDS = {
-    {"return", RETURN}, {"int", INT}, {"void", VOID}};
+unordered_map<string, token::Type> KEYWORDS = {
+    {"return", token::RETURN}, {"int", token::INT}, {"void", token::VOID}};
 
 Lexer::Lexer(string input) : input(input) { cout << input << endl; }
 
-void Lexer::addToken(TokenType tt, string val) {
-    tokens.push_back(Token(tt, val, line));
+void Lexer::addToken(token::Type tt, string val) {
+    tokens.push_back(token::Token(tt, val, line));
 }
 
 bool Lexer::isAtEnd() { return index >= input.size(); }
@@ -46,7 +47,7 @@ void Lexer::scanNumber() {
         step();
     }
     string numStr = input.substr(start, index - start);
-    addToken(NUMBER, numStr);
+    addToken(token::NUMBER, numStr);
 }
 
 void Lexer::scanAlpha() {
@@ -57,7 +58,7 @@ void Lexer::scanAlpha() {
     if (KEYWORDS.count(name)) {
         addToken(KEYWORDS[name]);
     } else {
-        addToken(IDENTIFIER, name);
+        addToken(token::IDENTIFIER, name);
     }
 }
 
@@ -72,19 +73,19 @@ void Lexer::scanToken() {
             line++;
             break;
         case '{':
-            addToken(OPEN_PARENTH);
+            addToken(token::OPEN_PARENTH);
             break;
         case '}':
-            addToken(CLOSE_PARENTH);
+            addToken(token::CLOSE_PARENTH);
             break;
         case '(':
-            addToken(OPEN_BRACE);
+            addToken(token::OPEN_BRACE);
             break;
         case ')':
-            addToken(CLOSE_BRACE);
+            addToken(token::CLOSE_BRACE);
             break;
         case ';':
-            addToken(SEMICOLON);
+            addToken(token::SEMICOLON);
             break;
         default:
             if (isDigit(c)) {
@@ -99,12 +100,12 @@ void Lexer::scanToken() {
     }
 }
 
-vector<Token> Lexer::Lex() {
+vector<token::Token> Lexer::Lex() {
     while (!isAtEnd()) {
         start = index;
         scanToken();
     }
-    addToken(_EOF);
+    addToken(token::_EOF);
     return tokens;
 }
 
@@ -113,11 +114,11 @@ void Lexer::PrintTokens() {
     size_t scope = 0;
 
     for (size_t i = 0; i < tokens.size(); i++) {
-        if (tokens[i].type == OPEN_PARENTH) {
+        if (tokens[i].type == token::OPEN_PARENTH) {
             scope++;
-        } else if (tokens[i].type == CLOSE_PARENTH) {
+        } else if (tokens[i].type == token::CLOSE_PARENTH) {
             scope--;
-        } else if (tokens[i].type == _EOF) {
+        } else if (tokens[i].type == token::_EOF) {
             cout << '\n';
             return;
         }

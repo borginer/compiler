@@ -1,8 +1,9 @@
 #include "common/token.hpp"
 
 using namespace std;
+using namespace token;
 
-Token::Token(TokenType tt, string value, size_t line)
+Token::Token(Type tt, string value, size_t line)
     : type(tt), value(value), line(line) {}
 
 string Token::toString() {

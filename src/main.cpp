@@ -17,7 +17,7 @@ int main(int argc, char* argv[]) {
     stringstream buffer;
     buffer << file.rdbuf();
 
-    Lexer tok(buffer.str());
-    vector<Token> tokens = tok.Lex();
+    lexer::Lexer tok(buffer.str());
+    vector<token::Token> tokens = tok.Lex();
     tok.PrintTokens();
 }

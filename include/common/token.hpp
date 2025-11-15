@@ -2,7 +2,8 @@
 
 #include <string>
 
-enum TokenType {
+namespace token {
+enum Type {
     // single char tokens
     OPEN_BRACE,
     CLOSE_BRACE,
@@ -22,10 +23,11 @@ enum TokenType {
 
 class Token {
    public:
-    TokenType type;
+    Type type;
     std::string value;
     std::size_t line;
 
-    Token(TokenType tt, std::string val, size_t line);
+    Token(Type tt, std::string val, size_t line);
     std::string toString();
 };
+}  // namespace token

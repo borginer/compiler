@@ -1,9 +1,10 @@
 *.o
 *.out
-*.c
 *.s
+*.json
 main
 bin
 build
 .vscode
 .clang-format
+.cache
