@@ -4,12 +4,13 @@
 #include <string>
 #include <vector>
 
-#include "common/token.hpp"
+#include "token/token.hpp"
+
 namespace lexer {
 class Lexer {
     size_t index = 0;
     size_t start = 0;
-    size_t line = 15;
+    size_t line = 1;
     std::string input;
     std::vector<token::Token> tokens;
 

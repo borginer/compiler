@@ -3,6 +3,7 @@
 #include <sstream>
 
 #include "lexer/lexer.hpp"
+#include "parser/parser.hpp"
 
 using namespace std;
 
@@ -19,5 +20,11 @@ int main(int argc, char* argv[]) {
 
     lexer::Lexer tok(buffer.str());
     vector<token::Token> tokens = tok.Lex();
+    cout << endl;
     tok.PrintTokens();
+
+    cout << endl;
+    ast::AST ast = ast::AST(tokens);
+    ast.ParseProgram();
+    ast.PrintProgram();
 }

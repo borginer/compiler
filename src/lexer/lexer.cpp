@@ -1,4 +1,4 @@
-#include "lexer/lexer.hpp"
+#include "lexer.hpp"
 
 #include <cstddef>
 #include <iostream>
@@ -93,7 +93,8 @@ void Lexer::scanToken() {
             } else if (isAlpha(c)) {
                 scanAlpha();
             } else {
-                cerr << "unexpected token on line: " + to_string(line) << endl;
+                cerr << "unexpected character '" << c << "'"
+                     << " on line: " + to_string(line) << endl;
                 exit(2);
             }
             break;

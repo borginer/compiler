@@ -1,4 +1,4 @@
-#include "common/token.hpp"
+#include "token.hpp"
 
 using namespace std;
 using namespace token;
