@@ -31,3 +31,5 @@ string Token::toString() const {
             return "not implemented yet";
     }
 }
+
+Tokens::Tokens(vector<token::Token> tokens) : tokens(std::move(tokens)) {}

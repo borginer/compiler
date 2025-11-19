@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cstddef>
 #include <memory>
 #include <string>
 #include <vector>
@@ -7,42 +8,55 @@
 #include "token/token.hpp"
 
 namespace ast {
-enum Type {
-    PROGRAM,
-    FUNCTION_DEF,
-    STATEMENT,
-    EXP,
-    IDENTIFIER,
-    INT,
-};
 
 class Node {
    public:
-    Type type;
-    std::vector<std::unique_ptr<Node>> children;
-    std::string value;
-    std::string name;
+    virtual ~Node() = default;
+    virtual std::string toString(size_t scope) = 0;
+};
 
-    Node(Type type);
-    std::string toString();
+struct Exp : public Node {};
+
+struct Statement : public Node {};
+
+class FunctionDef : public Node {
+    std::string name;
+    std::unique_ptr<Statement> body;
+
+   public:
+    FunctionDef(token::Tokens& tokens);
+    std::string toString(size_t scope) override;
+};
+
+class Program : public Node {
+    std::unique_ptr<FunctionDef> function;
+
+   public:
+    Program(token::Tokens& tokens);
+    std::string toString(size_t scope) override;
+};
+
+struct Constant : public Exp {
+    std::string value;
+
+   public:
+    Constant(token::Tokens& tokens);
+    std::string toString(size_t scope) override;
+};
+
+class Return : public Statement {
+    std::unique_ptr<Exp> exp;
+
+   public:
+    Return(token::Tokens& tokens);
+    std::string toString(size_t scope) override;
 };
 
 class AST {
-    size_t index = 0;
-    size_t scope = 0;
-    std::vector<token::Token> tokens;
-
-    const token::Token& expect(token::Type type);
-    std::unique_ptr<Node> parseFunctionDef();
-    std::unique_ptr<Node> parseStatement();
-    std::unique_ptr<Node> parseExp();
-    std::string parseInt();
-    std::string parseIdentifier();
-    void printProgram(std::unique_ptr<Node>& node);
+    token::Tokens tokens;
 
    public:
     AST(std::vector<token::Token> tokens);
-    std::unique_ptr<Node> ParseProgram();
-    void PrintProgram(std::unique_ptr<Node>& treeHead);
+    std::unique_ptr<Program> ParseProgram();
 };
 }  // namespace ast

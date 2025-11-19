@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include <vector>
 
 namespace token {
 enum Type {
@@ -28,4 +29,14 @@ struct Token {
 
     std::string toString() const;
 };
+
+class Tokens {
+    size_t index = 0;
+    std::vector<token::Token> tokens;
+
+   public:
+    const token::Token& expect(token::Type type);
+    Tokens(std::vector<token::Token> tokens);
+};
+
 }  // namespace token

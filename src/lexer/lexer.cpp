@@ -19,7 +19,7 @@ bool isAlpha(char c) {
 unordered_map<string, token::Type> KEYWORDS = {
     {"return", token::RETURN}, {"int", token::INT}, {"void", token::VOID}};
 
-Lexer::Lexer(string input) : input(input) { cout << input << endl; }
+Lexer::Lexer(string input) : input(input) { }
 
 void Lexer::addToken(token::Type tt, string val) {
     tokens.emplace_back(tt, val, line);

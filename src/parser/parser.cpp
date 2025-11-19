@@ -3,38 +3,33 @@
 #include <cstddef>
 #include <iostream>
 #include <memory>
+#include <string>
+#include <utility>
 
 #include "token/token.hpp"
 
 using namespace std;
 using namespace ast;
 
-Node::Node(Type type) : type(type) {}
+string repeatTabs(size_t n) {
+    string tab = "   ";
+    string ret;
+    ret.reserve(n * tab.size());
 
-string Node::toString() {
-    switch (type) {
-        case PROGRAM:
-            return "PROGRAM";
-            break;
-        case FUNCTION_DEF:
-            return "FUNCTION_DEF: " + name;
-            break;
-        case STATEMENT:
-            return "STATEMENT: " + value;
-            break;
-        case EXP:
-            return "EXP: " + value;
-            break;
-        default:
-            cerr << "unsupported Node type" << endl;
-            exit(5);
-            break;
+    for (size_t i = 0; i < n; i++) {
+        ret += tab;
     }
+
+    return ret;
+}
+
+string parseIdentifier(token::Tokens& tokens) {
+    return tokens.expect(token::IDENTIFIER).value;
 }
 
 AST::AST(vector<token::Token> tokens) : tokens(std::move(tokens)) {}
 
-const token::Token& AST::expect(token::Type type) {
+const token::Token& token::Tokens::expect(token::Type type) {
     if (index < tokens.size() && tokens[index].type == type) {
         index++;
         return tokens[index - 1];
@@ -45,61 +40,58 @@ const token::Token& AST::expect(token::Type type) {
     }
 }
 
-unique_ptr<Node> AST::parseFunctionDef() {
-    auto function_def = make_unique<Node>(FUNCTION_DEF);
-
-    expect(token::INT);
-    function_def->name = expect(token::IDENTIFIER).value;
-    expect(token::OPEN_BRACE);
-    expect(token::VOID);
-    expect(token::CLOSE_BRACE);
-    expect(token::OPEN_PARENTH);
-    function_def->children.push_back(parseStatement());
-    expect(token::CLOSE_PARENTH);
-    return function_def;
+FunctionDef::FunctionDef(token::Tokens& tokens) {
+    tokens.expect(token::INT);
+    name = tokens.expect(token::IDENTIFIER).value;
+    tokens.expect(token::OPEN_BRACE);
+    tokens.expect(token::VOID);
+    tokens.expect(token::CLOSE_BRACE);
+    tokens.expect(token::OPEN_PARENTH);
+    body = make_unique<Return>(tokens);
+    tokens.expect(token::CLOSE_PARENTH);
 }
 
-unique_ptr<Node> AST::parseStatement() {
-    auto statement = make_unique<Node>(STATEMENT);
-    statement->value = "return";
-
-    expect(token::RETURN);
-    statement->children.push_back(parseExp());
-    expect(token::SEMICOLON);
-    return statement;
+string FunctionDef::toString(size_t scope) {
+    string str = repeatTabs(scope) + "Function(";
+    str += "\n" + repeatTabs(scope + 1) + "name=" + this->name;
+    str += "\n" + repeatTabs(scope + 1) +
+           "body=" + this->body->toString(scope + 1);
+    str += "\n" + repeatTabs(scope) + ")";
+    return str;
 }
 
-unique_ptr<Node> AST::parseExp() {
-    auto exp = make_unique<Node>(EXP);
-    exp->value = parseInt();
-    return exp;
+Return::Return(token::Tokens& tokens) {
+    tokens.expect(token::RETURN);
+    exp = make_unique<Constant>(tokens);
+    tokens.expect(token::SEMICOLON);
 }
 
-string AST::parseInt() { return expect(token::NUMBER).value; }
-
-string AST::parseIdentifier() { return expect(token::IDENTIFIER).value; }
-
-unique_ptr<Node> AST::ParseProgram() {
-    auto tree_head = make_unique<Node>(PROGRAM);
-    tree_head->children.push_back(parseFunctionDef());
-    return tree_head;
+string Return::toString(size_t scope) {
+    string str = "Return(";
+    str += "\n" + this->exp->toString(scope + 1);
+    str += "\n" + repeatTabs(scope) + ")";
+    return str;
 }
 
-void AST::PrintProgram(unique_ptr<Node>& treeHead) {
-    AST::printProgram(treeHead);
+Constant::Constant(token::Tokens& tokens) {
+    value = tokens.expect(token::NUMBER).value;
 }
 
-void AST::printProgram(unique_ptr<Node>& node) {
-    string tab = "   ";
+string Constant::toString(size_t scope) {
+    return repeatTabs(scope) + "Constant(" + this->value + ")";
+}
 
-    for (size_t i = 0; i < scope; i++) {
-        cout << tab;
-    }
-    cout << node->toString() << endl;
+Program::Program(token::Tokens& tokens) {
+    function = make_unique<FunctionDef>(tokens);
+}
 
-    scope++;
-    for (auto& child : node->children) {
-        printProgram(child);
-    }
-    scope--;
+string Program::toString(size_t scope) {
+    string str = repeatTabs(scope) + "Program(";
+    str += "\n" + this->function->toString(scope + 1);
+    str += "\n" + repeatTabs(scope) + ")";
+    return str;
+}
+
+unique_ptr<Program> AST::ParseProgram() {
+    return make_unique<Program>(this->tokens);
 }

@@ -19,14 +19,17 @@ int main(int argc, char* argv[]) {
     stringstream buffer;
     buffer << file.rdbuf();
 
+    cout << endl << "Program:" << endl;
+    cout << buffer.str() << endl;
     lexer::Lexer tok(buffer.str());
     vector<token::Token> tokens = tok.Lex();
-    cout << endl;
+
+    cout << endl << "Tokens:" << endl;
     tok.PrintTokens();
 
-    cout << endl;
+    cout << endl << "AST:" << endl;
     ast::AST ast = ast::AST(std::move(tokens));
     tokens.push_back(token::Token(token::IDENTIFIER, " ", 2));
     auto program_ast = ast.ParseProgram();
-    ast.PrintProgram(program_ast);
+    cout << program_ast->toString(0) << endl;
 }
